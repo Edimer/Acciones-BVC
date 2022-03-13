@@ -1,0 +1,99 @@
+---
+title: "Precios de acciones Colombia - BVC"
+subtitle: "Extracción de información: ETFs"
+author: "Edimer David Jaramillo"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      smooth_scroll: false
+      collapsed: false
+    df_print: paged
+    code_folding: hide
+    css: estilo.css 
+    theme: cosmo
+    highlight: kate
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE,
+                      warning = FALSE, fig.align = "center")
+
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(DT)
+library(rvest)
+
+theme_set(theme_minimal())
+```
+
+# Bibliotecas
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(DT)
+library(rvest)
+```
+
+# Funciones
+
+
+```{r}
+
+```
+
+# Acciones
+
+## Fuente original
+
+- [Fuente: Listado de Acciones y ETFs - Mercado Global Colombiano](https://www.bvc.com.co/pps/tibco/portalbvc/Home/Mercado+Global/Listado+de+Acciones+y+ETFs?action=dummy)
+
+## Web Scraping
+
+- Lectura de información contenida en la página web suministrada.
+
+```{r}
+url <- "https://www.bvc.com.co/pps/tibco/portalbvc/Home/Mercado+Global/Listado+de+Acciones+y+ETFs?action=dummy"
+
+web_info <- url %>% 
+  read_html()
+web_info
+```
+
+- Accediendo a la información que está en el *nodo* **body**.
+
+```{r}
+web_info %>% 
+  html_node("body")
+```
+
+- Se podría generar una base datos con la información de todas las tablas que están presentes en el *body* de la página web. 
+
+```{r}
+web_info %>% 
+  html_table(header = TRUE) %>% 
+  {.[[5]]} %>% 
+  clean_names() %>% 
+  pull(accion)
+```
+
+## Exportando datos
+
+```{r, eval=FALSE}
+write_csv(x = data_encuestas, file = "../data/EncuestasWikipedia-Colombia2022.csv")
+```
+
+```{r}
+library(quantmod)
+start <- as.Date("2022-01-01")
+end <- as.Date(Sys.Date())
+getSymbols("GCHOY", src = "yahoo", from = start, to = end, periodicity = "daily")
+
+x11()
+plot(CIB)
+```
+
